@@ -10,7 +10,7 @@ stop_containers:
 	fi
 
 create_container:
-	docker run --name ${DB_DOCKER_CONTAINER} -p 5432:5432 -e POSTGRES_USER=${USER} -e POSTGRES_PASSWORD=${PASSWORD} -d postgres:12-alpine
+	docker run --name ${DB_DOCKER_CONTAINER} -p 5432:5432 -e POSTGRES_USER=${USER} -e POSTGRES_PASSWORD=${PASSWORD} -d postgres:15-alpine
 
 create_db:
 	docker exec ${DB_DOCKER_CONTAINER} createdb --username=${USER} --owner=${USER} ${DB_NAME}
@@ -19,10 +19,10 @@ start_container:
 	docker start ${DB_DOCKER_CONTAINER}
 	
 create_migrations:
-	migrate create -ext sql -dir migrations -seq init
+	migrate create -ext sql -dir db/migrations add_users_table -seq init
 
 migrate_up:
-	migrate -path migrations -database "postgres://${USER}:${PASSWORD}@${HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable" up
+	migrate -path db/migrations -database "postgres://${USER}:${PASSWORD}@${HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable" -verbose up
 
 migrate_down:
-	migrate -path migrations -database postgres://${USER}:${PASSWORD}@${HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable down	
+	migrate -path db/migrations -database postgres://${USER}:${PASSWORD}@${HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable -verbose down
