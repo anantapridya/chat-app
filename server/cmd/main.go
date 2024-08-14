@@ -5,6 +5,7 @@ import (
 
 	"github.com/anantapridya/chat-app.git/db"
 	"github.com/anantapridya/chat-app.git/internal/user"
+	"github.com/anantapridya/chat-app.git/internal/ws"
 	"github.com/anantapridya/chat-app.git/router"
 )
 
@@ -18,6 +19,11 @@ func main() {
 	userSvc := user.NewService(userRep)
 	userHandler := user.NewHandler(userSvc)
 
-	router.InitRouter(userHandler)
+	hub := ws.NewHub()
+	wsHandler := ws.NewHandler(hub)
+	go hub.Run()
+
+
+	router.InitRouter(userHandler, wsHandler)
 	router.Start("0.0.0.0:5000")
 }
